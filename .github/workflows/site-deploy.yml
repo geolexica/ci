@@ -96,7 +96,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     environment:
-      name: ${{ inputs.environment-path }}
+      name: ${{ inputs.environment-name }}
       url: ${{ inputs.environment-url }}
     steps:
     - uses: actions/download-artifact@v3
