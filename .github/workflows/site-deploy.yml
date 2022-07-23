@@ -36,6 +36,7 @@ on:
       aws-s3-bucket-name:
         required: true
         type: string
+    secrets:
 
 jobs:
   build:
@@ -115,7 +116,7 @@ jobs:
         aws-secret-access-key: ${{ inputs.aws-secret-access-key }}
         aws-region: ${{ inputs.aws-region }}
 
-    - name: Deploy to ${{ secrets.S3_BUCKET_NAME }}
+    - name: Deploy to ${{ inputs.aws-s3-bucket-name }}
       env:
         CLOUDFRONT_DISTRIBUTION_ID: ${{ inputs.aws-cf-distribution-id }}
         S3_BUCKET_NAME: ${{ inputs.aws-s3-bucket-name }}
