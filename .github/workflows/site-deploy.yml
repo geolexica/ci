@@ -46,3 +46,48 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y curl make libxml2-dev libxslt-dev openssl
+
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Use Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 2.7
+        bundler-cache: true
+
+    - name: Checkout data
+      uses: actions/checkout@v3
+      with:
+        token: ${{ github.token }}
+        repository: ${{ inputs.repository }}
+        path: ${{ inputs.concepts-path }}
+        ref: main
+        fetch-depth: 1
+
+    - name: Cache relaton
+      uses: actions/cache@v3
+      with:
+        path: relaton
+        key: ${{ runner.os }}-${{ hashFiles(join(inputs.concepts-path, '/**/*.yaml')) }}
+
+    - name: Use Node
+      uses: actions/setup-node@v2
+      with:
+        node-version: '10'
+        cache: 'npm'
+
+    - run: npm install
+
+    - name: Build site
+      run: make _site
+
+    - name: Compress files
+      run: zip -9 -r site.zip _site
+
+    - uses: actions/upload-artifact@v3
+      if: ${{ github.ref == inputs.production-branch || github.ref == inputs.staging-branch || github.event.client_payload.ref == inputs.production-branch || github.event.client_payload.ref == inputs.staging-branch }}
+      with:
+        name: site
+        path: site.zip
+
