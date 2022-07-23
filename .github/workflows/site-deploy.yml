@@ -107,14 +107,14 @@ jobs:
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
-        aws-access-key-id: ${{ inputs.aws-access-key-id }}
-        aws-secret-access-key: ${{ inputs.aws-secret-access-key }}
-        aws-region: ${{ inputs.aws-region }}
+        aws-access-key-id: ${{ secrets.aws-access-key-id }}
+        aws-secret-access-key: ${{ secrets.aws-secret-access-key }}
+        aws-region: ${{ secrets.aws-region }}
 
-    - name: Deploy to ${{ inputs.aws-s3-bucket-name }}
+    - name: Deploy to ${{ secrets.aws-s3-bucket-name }}
       env:
-        CLOUDFRONT_DISTRIBUTION_ID: ${{ inputs.aws-cf-distribution-id }}
-        S3_BUCKET_NAME: ${{ inputs.aws-s3-bucket-name }}
+        CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.aws-cf-distribution-id }}
+        S3_BUCKET_NAME: ${{ secrets.aws-s3-bucket-name }}
       run: |
         aws configure set default.s3.max_concurrent_requests 100
         aws configure set default.s3.max_queue_size 10000
