@@ -12,13 +12,13 @@ on:
       production-branch:
         required: true
         type: string
-      production-site:
-        required: true
-        type: string
       staging-branch:
         required: true
         type: string
-      staging-site:
+      environment-name:
+        required: true
+        type: string
+      environment-url:
         required: true
         type: string
       aws-access-key-id:
@@ -96,8 +96,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     environment:
-      name: ${{ github.ref == inputs.production-branch && 'production' || 'staging' }}
-      url: ${{ github.ref == inputs.production-branch && inputs.production-site || inputs.staging-site }}
+      name: ${{ inputs.environment-path }}
+      url: ${{ inputs.environment-url }}
     steps:
     - uses: actions/download-artifact@v3
       with:
