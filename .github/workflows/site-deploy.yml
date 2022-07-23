@@ -21,6 +21,7 @@ on:
       environment-url:
         required: true
         type: string
+    secrets:
       aws-access-key-id:
         required: true
         type: string
@@ -36,7 +37,6 @@ on:
       aws-s3-bucket-name:
         required: true
         type: string
-    secrets:
 
 jobs:
   build:
