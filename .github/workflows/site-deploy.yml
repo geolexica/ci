@@ -1,0 +1,138 @@
+name: site-deploy
+
+on:
+  workflow_call:
+    inputs:
+      repository:
+        required: true
+        type: string
+      concepts-path:
+        required: true
+        type: string
+      production-branch:
+        required: true
+        type: string
+      production-site:
+        required: true
+        type: string
+      staging-branch:
+        required: true
+        type: string
+      staging-site:
+        required: true
+        type: string
+      aws-access-key-id:
+        required: true
+        type: string
+      aws-secret-access-key:
+        required: true
+        type: string
+      aws-region:
+        required: true
+        type: string
+      aws-cf-distribution-id:
+        required: true
+        type: string
+      aws-s3-bucket-name:
+        required: true
+        type: string
+
+    # secrets:
+    #   token:
+    #     required: true
+  # repository_dispatch:
+  #   types:
+  #   - deploy
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Setup prerequisites
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y curl make libxml2-dev libxslt-dev openssl
+
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Use Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 2.7
+        bundler-cache: true
+
+    - name: Checkout data
+      uses: actions/checkout@v3
+      with:
+        token: ${{ github.token }}
+        repository: ${{ inputs.repository }}
+        path: ${{ inputs.concepts-path }}
+        ref: main
+        fetch-depth: 1
+
+    - name: Cache relaton
+      uses: actions/cache@v3
+      with:
+        path: relaton
+        key: ${{ runner.os }}-${{ hashFiles(join(inputs.concepts-path, '/**/*.yaml') }}
+
+    - name: Use Node
+      uses: actions/setup-node@v2
+      with:
+        node-version: '10'
+        cache: 'npm'
+
+    - run: npm install
+
+    - name: Build site
+      run: make _site
+
+    - name: Compress files
+      run: zip -9 -r site.zip _site
+
+    - uses: actions/upload-artifact@v3
+      if: ${{ github.ref == inputs.production-branch || github.ref == inputs.staging-branch || github.event.client_payload.ref == inputs.production-branch || github.event.client_payload.ref == inputs.staging-branch }}
+      with:
+        name: site
+        path: site.zip
+
+  deploy:
+      if: ${{ github.ref == inputs.production-branch || github.ref == inputs.staging-branch || github.event.client_payload.ref == inputs.production-branch || github.event.client_payload.ref == inputs.staging-branch }}
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: ${{ github.ref == inputs.production-branch && 'production' || 'staging' }}
+      url: ${{ github.ref == inputs.production-branch && inputs.production-site || inputs.staging-site }}
+    steps:
+    - uses: actions/download-artifact@v3
+      with:
+        name: site
+
+    - name: Display structure of downloaded files
+      run: ls -R
+
+    - name: Decompress files
+      run: unzip site.zip
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ inputs.aws-access-key-id }}
+        aws-secret-access-key: ${{ inputs.aws-secret-access-key }}
+        aws-region: ${{ inputs.aws-region }}
+
+    - name: Deploy to ${{ secrets.S3_BUCKET_NAME }}
+      env:
+        CLOUDFRONT_DISTRIBUTION_ID: ${{ inputs.aws-cf-distribution-id }}
+        S3_BUCKET_NAME: ${{ inputs.aws-s3-bucket-name }}
+      run: |
+        aws configure set default.s3.max_concurrent_requests 100
+        aws configure set default.s3.max_queue_size 10000
+        aws configure set default.s3.use_accelerate_endpoint true
+        aws configure set default.s3.payload_signing_enabled false
+        aws s3 sync _site s3://$S3_BUCKET_NAME --delete --no-progress --exclude "*" --include "*.html" --content-type "text/html; charset=utf-8"
+        aws s3 sync _site s3://$S3_BUCKET_NAME --delete --no-progress --exclude "*" --include "*.json" --content-type "text/json; charset=utf-8"
+        aws s3 sync _site s3://$S3_BUCKET_NAME --delete --no-progress --exclude "*.html,*.json" --include "*"
+        aws configure set preview.cloudfront true
+        aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DISTRIBUTION_ID --paths "/*"
