@@ -57,7 +57,7 @@ jobs:
     - name: Prepare environment props
       id: prepare
       run: |
-        if [ "$ref" = "refs/heads/main" ]; then
+        if [ "${{ inputs.ref }}" = "refs/heads/main" ]; then
           environment_name="production"
           environment_url="${{ inputs.production-url }}"
         elif [ "$ref" = "refs/heads/staging" ]; then
