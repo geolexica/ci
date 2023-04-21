@@ -57,7 +57,7 @@ jobs:
         token: ${{ github.token }}
         repository: ${{ inputs.repository }}
         path: ${{ inputs.concepts-path }}
-        ref: main
+        ref: ${{ github.event.client_payload.ref || github.ref }}
         fetch-depth: 1
 
     - name: Cache relaton
@@ -67,7 +67,7 @@ jobs:
         key: ${{ runner.os }}-${{ hashFiles(join(inputs.concepts-path, '/**/*.yaml')) }}
 
     - name: Use Node
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v3
       with:
         node-version: '10'
         cache: 'npm'
