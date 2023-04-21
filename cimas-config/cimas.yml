@@ -1,0 +1,163 @@
+---
+settings:
+  reviewers: []
+  assignees:
+  - CAMOBAP
+
+repositories:
+  ci:
+    remote: ssh://git@github.com/geolexica/ci
+    branch: main
+    files: []
+  oss-guides:
+    remote: ssh://git@github.com/geolexica/oss-guides
+    branch: master
+    files: []
+  infrastructure:
+    remote: ssh://git@github.com/geolexica/infrastructure
+    branch: main
+    files: []
+  isotc211-glossary-testing:
+    remote: ssh://git@github.com/geolexica/isotc211-glossary-testing
+    branch: main
+    files: []
+  isotc211-glossary-support:
+    remote: ssh://git@github.com/geolexica/isotc211-glossary-support
+    branch: main
+    files: []
+  osgeo-glossary-support:
+    remote: ssh://git@github.com/geolexica/osgeo-glossary-testing
+    branch: main
+    files: []
+
+  geolexica.org:
+    remote: ssh://git@github.com/geolexica/geolexica.org
+    branch: main
+    files: []
+  isotc204.geolexica.org:
+    remote: ssh://git@github.com/geolexica/isotc204.geolexica.org
+    branch: main
+    files: []
+  isotc211.geolexica.org:
+    remote: ssh://git@github.com/geolexica/isotc211.geolexica.org
+    branch: main
+    files: []
+  osgeo.geolexica.org:
+    remote: ssh://git@github.com/geolexica/osgeo.geolexica.org
+    branch: main
+    files: []
+
+  isotc204-glossary:
+    remote: ssh://git@github.com/geolexica/isotc204-glossary
+    branch: main
+    files: []
+  isotc211-glossary:
+    remote: ssh://git@github.com/geolexica/isotc211-glossary
+    branch: main
+    files: []
+  osgeo-glossary:
+    remote: ssh://git@github.com/geolexica/osgeo-glossary
+    branch: main
+    files: []
+  geoforall-glossary:
+    remote: ssh://git@github.com/geolexica/osgeo-glossary
+    branch: main
+    files: []
+
+  tc211-termbase:
+    remote: ssh://git@github.com/geolexica/tc211-termbase
+    branch: master
+    files:
+      .github/workflows/rake.yml: gh-actions/rake.yml
+      .github/workflows/release.yml: gh-actions/release.yml
+  osgeo-termbase:
+    remote: ssh://git@github.com/geolexica/osgeo-termbase
+    branch: master
+    files:
+      .github/workflows/rake.yml: gh-actions/rake.yml
+      .github/workflows/release.yml: gh-actions/release.yml
+  jekyll-geolexica:
+    remote: ssh://git@github.com/geolexica/jekyll-geolexica
+    branch: main
+    files: []
+  geolexica-site:
+    remote: ssh://git@github.com/geolexica/geolexica-site
+    branch: main
+    files:
+      .github/workflows/rake.yml: gh-actions/rake.yml
+      .github/workflows/release.yml: gh-actions/release.yml
+  geolexica-server:
+    remote: ssh://git@github.com/geolexica/geolexica-server
+    branch: main
+    files:
+      .github/workflows/rake.yml: gh-actions/rake.yml
+      .github/workflows/release.yml: gh-actions/release.yml
+  liquid-pry:
+    remote: ssh://git@github.com/geolexica/liquid-pry
+    branch: main
+    files: []
+  jekyll-tidy-json:
+    remote: ssh://git@github.com/geolexica/jekyll-tidy-json
+    branch: main
+    files: []
+
+  breviter:
+    remote: ssh://git@github.com/geolexica/breviter
+    branch: main
+    files: []
+  breviter-report:
+    remote: ssh://git@github.com/geolexica/breviter-report
+    branch: main
+    files: []
+  breviter-compare:
+    remote: ssh://git@github.com/geolexica/breviter-compare
+    branch: main
+    files: []
+  geolexica-rdf-ref:
+    remote: ssh://git@github.com/geolexica/geolexica-rdf-ref
+    branch: main
+    files: []
+  metanorma:
+    remote: ssh://git@github.com/geolexica/metanorma
+    branch: main
+    files: []
+  iso14812:
+    remote: ssh://git@github.com/geolexica/iso14812
+    branch: main
+    files: []
+
+groups:
+  infrastructure:
+  - ci
+  - oss-guides
+  - infrastructure
+  - isotc211-glossary-testing
+  - isotc211-glossary-support
+  - osgeo-glossary-support:
+  site:
+  - geolexica.org
+  - isotc204.geolexica.org
+  - isotc211.geolexica.org
+  - osgeo.geolexica.org
+  glossary:
+  - isotc204-glossary
+  - isotc211-glossary
+  - osgeo-glossary
+  - geoforall-glossary
+  gems:
+  - tc211-termbase
+  - jekyll-geolexica
+  - geolexica-site
+  - osgeo-termbase
+  - jekyll-geolexica
+  - geolexica-site
+  - geolexica-server
+  - liquid-pry
+  - jekyll-tidy-json:
+  ignore:
+  - breviter-compare
+  - breviter-report
+  - breviter
+  - geolexica-rdf-ref
+  - metanorma
+  - iso14812
