@@ -3,11 +3,20 @@ name: site-deploy
 on:
   workflow_call:
     inputs:
+      ref:
+        required: true
+        type: string
       repository:
         required: true
         type: string
       concepts-path:
         required: true
+        type: string
+      breviter-repository:
+        required: false
+        type: string
+      breviter-path:
+        required: false
         type: string
       production-branch:
         required: true
@@ -15,10 +24,10 @@ on:
       staging-branch:
         required: true
         type: string
-      environment-name:
+      production-url:
         required: true
         type: string
-      environment-url:
+      staging-url:
         required: true
         type: string
     secrets:
@@ -36,14 +45,36 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      environment-name: ${{ steps.prepare.outputs.environment-name }}
+      environment-url: ${{ steps.prepare.outputs.environment-url }}
     steps:
     - name: Setup prerequisites
       run: |
         sudo apt-get update
         sudo apt-get install -y curl make libxml2-dev libxslt-dev openssl
 
+    - name: Prepare environment props
+      id: prepare
+      run: |
+        if [ "$ref" = "refs/heads/main" ]; then
+          environment_name="production"
+          environment_url="${{ inputs.production-url }}"
+        elif [ "$ref" = "refs/heads/staging" ]; then
+          environment_name="staging"
+          environment_url="${{ inputs.staging-url }}"
+        else
+          environment_name=skip
+          environment_url=missing
+        fi
+
+        echo "environment-url=${environment_url}" >> $GITHUB_OUTPUT
+        echo "environment-name=${environment_name}" >> $GITHUB_OUTPUT
+
     - name: Checkout repository
       uses: actions/checkout@v3
+      with:
+        ref: ${{ inputs.ref }}
 
     - name: Use Ruby
       uses: ruby/setup-ruby@v1
@@ -57,8 +88,19 @@ jobs:
         token: ${{ github.token }}
         repository: ${{ inputs.repository }}
         path: ${{ inputs.concepts-path }}
-        ref: ${{ github.event.client_payload.ref || github.ref }}
+        ref: ${{ steps.prepare.outputs.environment-name == 'skip' && inputs.production-branch || inputs.ref }}
         fetch-depth: 1
+
+    - name: Checkout breviter
+      if: inputs.breviter-repository != ''
+      uses: actions/checkout@v3
+      with:
+        token: ${{ github.token }}
+        repository: ${{ inputs.breviter-repository }}
+        path: ${{ inputs.breviter-path }}
+        ref: main
+        fetch-depth: 1
+        submodules: true
 
     - name: Cache relaton
       uses: actions/cache@v3
@@ -69,7 +111,7 @@ jobs:
     - name: Use Node
       uses: actions/setup-node@v3
       with:
-        node-version: '10'
+        node-version: '12'
         cache: 'npm'
 
     - run: npm install
@@ -81,18 +123,18 @@ jobs:
       run: zip -9 -r site.zip _site
 
     - uses: actions/upload-artifact@v3
-      if: ${{ github.ref == inputs.production-branch || github.ref == inputs.staging-branch || github.event.client_payload.ref == inputs.production-branch || github.event.client_payload.ref == inputs.staging-branch }}
+      if: steps.prepare.outputs.environment-name != 'skip'
       with:
         name: site
         path: site.zip
 
   deploy:
-    if: ${{ github.ref == inputs.production-branch || github.ref == inputs.staging-branch || github.event.client_payload.ref == inputs.production-branch || github.event.client_payload.ref == inputs.staging-branch }}
+    if: needs.build.outputs.environment-name != 'skip'
     runs-on: ubuntu-latest
     needs: build
     environment:
-      name: ${{ inputs.environment-name }}
-      url: ${{ inputs.environment-url }}
+      name: ${{ needs.build.outputs.environment-name }}
+      url: ${{ needs.build.outputs.environment-url }}
     steps:
     - uses: actions/download-artifact@v3
       with:
