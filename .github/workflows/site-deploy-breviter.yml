@@ -63,7 +63,7 @@ jobs:
         token: ${{ github.token }}
         repository: ${{ inputs.repository }}
         path: ${{ inputs.concepts-path }}
-        ref: ${{ inputs.environment-name == 'skip' && 'main' || github.ref }}
+        ref: ${{ inputs.environment-name == 'skip' && 'main' || inputs.environment-name == 'staging' && 'staging' || github.ref }}
         fetch-depth: 1
 
     - name: Checkout breviter
