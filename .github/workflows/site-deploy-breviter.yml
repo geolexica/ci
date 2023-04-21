@@ -63,7 +63,7 @@ jobs:
         token: ${{ github.token }}
         repository: ${{ inputs.repository }}
         path: ${{ inputs.concepts-path }}
-        ref: main
+        ref: ${{ inputs.environment-name == 'skip' && 'main' || github.ref }}
         fetch-depth: 1
 
     - name: Checkout breviter
@@ -83,7 +83,7 @@ jobs:
         key: ${{ runner.os }}-${{ hashFiles(join(inputs.concepts-path, '/**/*.yaml')) }}
 
     - name: Use Node
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v3
       with:
         node-version: '12'
         cache: 'npm'
@@ -97,13 +97,13 @@ jobs:
       run: zip -9 -r site.zip _site
 
     - uses: actions/upload-artifact@v3
-      if: ${{ github.ref == inputs.production-branch || github.ref == inputs.staging-branch || github.event.client_payload.ref == inputs.production-branch || github.event.client_payload.ref == inputs.staging-branch }}
+      if: ${{ inputs.environment-name == 'staging' || inputs.environment-name == 'production' }}
       with:
         name: site
         path: site.zip
 
   deploy:
-    if: ${{ github.ref == inputs.production-branch || github.ref == inputs.staging-branch || github.event.client_payload.ref == inputs.production-branch || github.event.client_payload.ref == inputs.staging-branch }}
+    if: ${{ inputs.environment-name == 'staging' || inputs.environment-name == 'production' }}
     runs-on: ubuntu-latest
     needs: build
     environment:
