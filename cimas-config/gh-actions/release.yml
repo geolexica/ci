@@ -14,8 +14,8 @@ on:
 
 jobs:
   release:
-    uses: relaton/support/.github/workflows/release.yml@master
+    uses: geolexica/ci/.github/workflows/release.yml@main
     with:
       next_version: ${{ github.event.inputs.next_version }}
     secrets:
-      rubygems-api-key: ${{ secrets.RELATON_CI_RUBYGEMS_API_KEY }}
+      rubygems-api-key: ${{ secrets.GEOLEXICA_RUBYGEMS_API_KEY }}
