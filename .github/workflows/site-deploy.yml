@@ -60,7 +60,7 @@ jobs:
         if [ "${{ inputs.ref }}" = "refs/heads/main" ]; then
           environment_name="production"
           environment_url="${{ inputs.production-url }}"
-        elif [ "$ref" = "refs/heads/staging" ]; then
+        elif [ "${{ inputs.ref }}" = "refs/heads/staging" ]; then
           environment_name="staging"
           environment_url="${{ inputs.staging-url }}"
         else
