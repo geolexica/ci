@@ -52,7 +52,7 @@ jobs:
     - name: Setup prerequisites
       run: |
         sudo apt-get update
-        sudo apt-get install -y curl make libxml2-dev libxslt-dev openssl
+        sudo apt-get install -y curl make libxml2-dev libxslt-dev openssl libcurl4-openssl-dev
 
     - name: Prepare environment props
       id: prepare
