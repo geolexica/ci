@@ -3,6 +3,10 @@ name: glossary-build
 on:
   workflow_call:
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   build:
     runs-on: ubuntu-latest
