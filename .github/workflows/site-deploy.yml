@@ -42,6 +42,10 @@ on:
       aws-s3-bucket-name:
         required: true
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   build:
     runs-on: ubuntu-latest

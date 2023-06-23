@@ -10,6 +10,10 @@ on:
       token:
         required: true
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   trigger-deploy:
     name: Trigger deploy
