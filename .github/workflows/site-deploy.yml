@@ -76,7 +76,7 @@ jobs:
         echo "environment-name=${environment_name}" >> $GITHUB_OUTPUT
 
     - name: Checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         ref: ${{ inputs.ref }}
 
@@ -87,7 +87,7 @@ jobs:
         bundler-cache: true
 
     - name: Checkout data
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         token: ${{ github.token }}
         repository: ${{ inputs.repository }}
@@ -97,7 +97,7 @@ jobs:
 
     - name: Checkout breviter
       if: inputs.breviter-repository != ''
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         token: ${{ github.token }}
         repository: ${{ inputs.breviter-repository }}
@@ -107,13 +107,13 @@ jobs:
         submodules: true
 
     - name: Cache relaton
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: relaton
         key: ${{ runner.os }}-${{ hashFiles(join(inputs.concepts-path, '/**/*.yaml')) }}
 
     - name: Use Node
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: '12'
         cache: 'npm'
@@ -126,7 +126,7 @@ jobs:
     - name: Compress files
       run: zip -9 -r site.zip _site
 
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       if: steps.prepare.outputs.environment-name != 'skip'
       with:
         name: site
@@ -140,7 +140,7 @@ jobs:
       name: ${{ needs.build.outputs.environment-name }}
       url: ${{ needs.build.outputs.environment-url }}
     steps:
-    - uses: actions/download-artifact@v3
+    - uses: actions/download-artifact@v4
       with:
         name: site
 
