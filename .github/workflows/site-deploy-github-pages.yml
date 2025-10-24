@@ -24,6 +24,10 @@ on:
       production-url:
         required: true
         type: string
+      ruby-version:
+        required: false
+        type: string
+        default: '3.0'
 
 defaults:
   run:
@@ -75,7 +79,7 @@ jobs:
     - name: Use Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 2.7
+        ruby-version: ${{ inputs.ruby-version }}
         bundler-cache: true
 
     - name: Checkout data
